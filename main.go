@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/abu-lang/abusim-core/abusim-goabu-agent/endpoint"
-	"github.com/abu-lang/abusim-core/abusim-goabu-agent/memory"
+	"bufio"
 	"os"
 	"time"
+
+	"github.com/abu-lang/abusim-core/abusim-goabu-agent/endpoint"
+	"github.com/abu-lang/abusim-core/abusim-goabu-agent/memory"
 
 	"github.com/abu-lang/abusim-core/schema"
 	"github.com/abu-lang/goabu"
@@ -15,12 +17,21 @@ import (
 )
 
 func main() {
+	var configStr string
 	// I check if a config is present on the Args...
 	if len(os.Args) < 2 {
-		log.Fatalln("Config not found, exiting")
+		// ... if not, I look for a config on stdin
+		reader := bufio.NewReaderSize(os.Stdin, 131072) // 128kB buffer size
+		var err error
+		configStr, err = reader.ReadString('\n')
+		if err != nil {
+			log.Fatalf("Can't read configuration> %v", err)
+		}
+	} else {
+		// ... if there is, I pull the config from the Args
+		configStr = os.Args[1]
 	}
 	// ... and I deserialize it to get its fields
-	configStr := os.Args[1]
 	agent := schema.AgentConfiguration{}
 	err := agent.Deserialize(configStr)
 	if err != nil {
