@@ -70,6 +70,8 @@ func main() {
 	// ... and I start the main message loop
 	go end.HandleMessages(exec, agent, &paused)
 	// Finally, I start the executer loop
+	os.Stdout.WriteString("Lorem ipsum dolor sit amet\n")
+
 	log.Println("Starting main loop")
 	for {
 		// I execute a command if not paused...
